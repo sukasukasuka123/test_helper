@@ -1,4 +1,5 @@
 # service/stats.py
+# 面试记录统计服务
 import json
 from datetime import datetime
 

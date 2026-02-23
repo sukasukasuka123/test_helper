@@ -1,4 +1,5 @@
 # selector.py
+# 题目选择器（随机抽题）
 import random
 import hashlib
 

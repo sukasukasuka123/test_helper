@@ -1,4 +1,5 @@
 # db.py
+# 这里的作用是提供数据库管理的基类
 import sqlite3
 from threading import Lock
 

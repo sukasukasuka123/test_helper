@@ -1,7 +1,10 @@
 # interviewee.py
+# 面试者管理
 import json
 import hashlib
 from datetime import datetime
+from typing import List
+
 
 class IntervieweeManager:
     SALT = "LAB_INTERVIEW_SALT_2026"
@@ -34,3 +37,13 @@ class IntervieweeManager:
             )
         )
         return cur.lastrowid
+    def get_interviewee_inPage(self, page: int,pageSize: int) -> List[dict]:
+        cur = self.db.execute(
+            """
+            SELECT * FROM intervieewee
+            limit ? offset ?
+            """,
+            (pageSize, page)
+        )
+        results = cur.fetchall()
+        return results

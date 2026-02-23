@@ -1,4 +1,5 @@
 # meta.py
+# 题库元数据管理，即统计出筛选的条件有哪些
 class QuestionMetaManager:
     def __init__(self, db):
         self.db = db

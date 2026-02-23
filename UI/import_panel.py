@@ -1,4 +1,5 @@
 # UI/import_panel.py
+# 题库导入面板
 from PySide6.QtWidgets import (
     QPushButton,
     QLabel,
