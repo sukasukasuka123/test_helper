@@ -17,6 +17,10 @@ from service.importer import QuestionImporter
 from service.exporter import DataExporter
 from service.analyzer import IntervieweeAnalyzer
 
+# ===== Agent 模块导入 =====
+from service.agent_core import Agent
+from service.agent_tools import register_default_tools
+
 from UI.session_controller import InterviewSessionController
 from UI.interviewee_panel import IntervieweePanel
 from UI.question_select_panel import QuestionSelectPanel
@@ -26,6 +30,9 @@ from UI.stats_panel import StatsPanel
 from UI.import_panel import QuestionImportPanel
 from UI.export_panel import ExportPanel
 from UI.analysis_panel import AnalysisPanel
+
+# ===== Agent UI 导入 =====
+from UI.agent_panel import AgentPanel
 
 
 def main():
@@ -43,6 +50,20 @@ def main():
     exporter = DataExporter(db)
     analyzer = IntervieweeAnalyzer(db)
 
+    # ===== Agent 初始化 =====
+    agent = Agent(db, system_prompt="""
+你是一个实验室面试助手 Agent。
+你可以使用工具来帮助用户:
+- 查询题库统计信息
+- 分析面试者表现
+- 生成面试报告
+
+请根据用户需求,选择合适的工具来完成任务。
+    """)
+
+    # 注册默认工具
+    register_default_tools(agent, db)
+
     # ---- Session Controller ----
     session = InterviewSessionController()
 
@@ -51,6 +72,9 @@ def main():
     interviewee_panel = IntervieweePanel(interviewee_mgr, session)
     export_panel = ExportPanel(exporter)
     analysis_panel = AnalysisPanel(analyzer)
+
+    # ===== Agent 面板 =====
+    agent_panel = AgentPanel(agent)
 
     select_panel = QuestionSelectPanel(meta_mgr, selector, session)
     runner_panel = QuestionRunnerPanel(selector, QuestionWidget, session)
@@ -67,7 +91,7 @@ def main():
     runner_panel.auto_save_hook = auto_save_current_question
 
     # =========================
-    # 左侧：管理区（使用 Tab）
+    # 左侧:管理区(使用 Tab)
     # =========================
     left_tabs = QTabWidget()
 
@@ -84,11 +108,17 @@ def main():
     analysis_layout.addWidget(export_panel)
     analysis_layout.addWidget(analysis_panel)
 
+    # ===== Tab 3: AI 助手 =====
+    agent_tab = QWidget()
+    agent_layout = QVBoxLayout(agent_tab)
+    agent_layout.addWidget(agent_panel)
+
     left_tabs.addTab(prepare_tab, "准备区")
     left_tabs.addTab(analysis_tab, "数据分析")
+    left_tabs.addTab(agent_tab, "AI 助手")
 
     # =========================
-    # 右侧：面试区
+    # 右侧:面试区
     # =========================
     right_container = QWidget()
     right_layout = QVBoxLayout(right_container)
@@ -104,7 +134,7 @@ def main():
     splitter.addWidget(right_container)
 
     splitter.setStretchFactor(0, 1)  # 左侧
-    splitter.setStretchFactor(1, 3)  # 右侧（核心区域）
+    splitter.setStretchFactor(1, 3)  # 右侧(核心区域)
 
     # =========================
     # Root
@@ -113,8 +143,8 @@ def main():
     root_layout = QHBoxLayout(root)
     root_layout.addWidget(splitter)
 
-    root.setWindowTitle("实验室面试追溯工具")
-    root.resize(1300, 750)
+    root.setWindowTitle("实验室面试协助工具（包括记录溯源和面试协助）")
+    root.resize(1400, 800)
     root.show()
 
     sys.exit(app.exec())
